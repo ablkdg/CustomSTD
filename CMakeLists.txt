@@ -4,9 +4,7 @@ project(CustomSTD)
 set(CMAKE_CXX_STANDARD 23)
 
 set(SOURCE_FILES main.cpp
-        Custom/map.h
         Custom/vector.h
-        Custom/hashmap3.h
         Custom/hash_map.h)
 
 add_executable(CustomSTD ${SOURCE_FILES})
