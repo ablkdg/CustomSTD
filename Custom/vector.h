@@ -3,7 +3,7 @@
 //
 #pragma once
 
-#ifndef DYNAMICARRAY_VECTOR_H
+#ifndef CUSTOM_VECTOR_H
 #define MIN_VECTOR_CAPACITY 8
 #define VECTOR_GROW_POWER 2
 
@@ -241,6 +241,6 @@ custom::vector<Type>::vector(const vector<Type> &other)
     std::copy(other.m_Arr, other.m_Arr + other.m_Size, m_Arr);
 }
 
-#define DYNAMICARRAY_VECTOR_H
+#define CUSTOM_VECTOR_H
 
-#endif //DYNAMICARRAY_VECTOR_H
+#endif //CUSTOM_VECTOR_H
