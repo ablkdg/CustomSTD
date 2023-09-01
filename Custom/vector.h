@@ -4,6 +4,7 @@
 #pragma once
 
 #ifndef CUSTOM_VECTOR_H
+#define CUSTOM_VECTOR_H
 #define MIN_VECTOR_CAPACITY 8
 #define VECTOR_GROW_POWER 2
 
@@ -240,7 +241,5 @@ custom::vector<Type>::vector(const vector<Type> &other)
     m_Arr = new Type[other.m_Capacity];
     std::copy(other.m_Arr, other.m_Arr + other.m_Size, m_Arr);
 }
-
-#define CUSTOM_VECTOR_H
 
 #endif //CUSTOM_VECTOR_H
