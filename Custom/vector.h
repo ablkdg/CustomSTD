@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <initializer_list>
+#include <iostream>
 
 namespace custom {
     // Template class for a custom vector
@@ -36,7 +37,7 @@ namespace custom {
         inline int capacity() { return m_Capacity; }
 
     public:
-        // Default constructor
+        // Constructors
         vector();
 
         vector(const vector<Type> &other);
@@ -51,10 +52,8 @@ namespace custom {
         // Destructor
         ~vector();
 
-        // Returns a pointer to first element of vector
         inline Type *begin() { return m_Arr; }
 
-        // Returns a pointer to one past the last element of vector
         inline Type *end() { return m_Arr + m_Size; }
 
         custom::vector<Type> &operator=(custom::vector<Type> &&other) noexcept;
@@ -74,12 +73,14 @@ namespace custom {
     };
 }
 
+
 template<typename Type>
 custom::vector<Type>::vector() {
     m_Arr = new Type[MIN_VECTOR_CAPACITY];
     m_Capacity = MIN_VECTOR_CAPACITY;
     m_Size = 0;
 }
+
 
 template<typename Type>
 custom::vector<Type>::vector(std::initializer_list<Type> initList) {
@@ -95,6 +96,7 @@ custom::vector<Type>::vector(std::initializer_list<Type> initList) {
     }
 }
 
+
 template<typename Type>
 custom::vector<Type>::vector(int size) {
     if (size < MIN_VECTOR_CAPACITY) size = MIN_VECTOR_CAPACITY;
@@ -103,10 +105,12 @@ custom::vector<Type>::vector(int size) {
     m_Size = 0;
 }
 
+
 template<typename Type>
 custom::vector<Type>::~vector() {
     delete[] m_Arr;
 }
+
 
 template<typename Type>
 void custom::vector<Type>::pop_back() {
@@ -114,12 +118,14 @@ void custom::vector<Type>::pop_back() {
     m_resize();
 }
 
+
 template<typename Type>
 void custom::vector<Type>::push_back(Type value) {
     m_Size++;
     m_resize();
     m_Arr[m_Size - 1] = value;
 }
+
 
 template<typename Type>
 void custom::vector<Type>::m_resize() {
@@ -170,15 +176,18 @@ void custom::vector<Type>::m_resize() {
     }
 }
 
+
 template<typename Type>
 Type custom::vector<Type>::at(int index) {
     return m_Arr[index];
 }
 
+
 template<typename Type>
 Type &custom::vector<Type>::operator[](int index) {
     return m_Arr[index];
 }
+
 
 // Move constructor definition for the vector class
 template<typename Type>
@@ -190,38 +199,32 @@ custom::vector<Type>::vector(custom::vector<Type> &&other) noexcept
     other.m_Capacity = 0;
 }
 
+
 // Move assignment operator definition for the vector class
 template<typename Type>
 custom::vector<Type> &custom::vector<Type>::operator=(custom::vector<Type> &&other) noexcept {
-    // Checking for self-assignment
     if (this != &other) {
-        // Remove the existing data in the current vector
         delete[] m_Arr;
 
-        // Copying the 'other' vector's data into the current vector
         m_Arr = other.m_Arr;
         m_Size = other.m_Size;
         m_Capacity = other.m_Capacity;
 
-        // Nullifying/zeroing the data members of the 'other' vector (which is being moved from)
+        // Clear the data members of the 'other' vector (which is being moved from)
         other.m_Arr = nullptr;
         other.m_Size = 0;
         other.m_Capacity = 0;
     }
-
-    // Returning the current object to enable operator chaining
     return *this;
 }
+
 
 // Copy assignment operator definition for the vector class
 template<typename Type>
 custom::vector<Type> &custom::vector<Type>::operator=(const custom::vector<Type> &other) {
-    // Checking for self-assignment
     if (this != &other) {
-        // Remove the existing data in the current vector
         delete[] m_Arr;
 
-        // Copying the 'other' vector's size and capacity into the current vector
         m_Size = other.m_Size;
         m_Capacity = other.m_Capacity;
 
@@ -229,9 +232,9 @@ custom::vector<Type> &custom::vector<Type>::operator=(const custom::vector<Type>
         m_Arr = new Type[other.m_Capacity];
         std::copy(other.m_Arr, other.m_Arr + other.m_Size, m_Arr);
     }
-    // Returning the current object to enable operator chaining
     return *this;
 }
+
 
 // Copy constructor definition for the vector class
 template<typename Type>
