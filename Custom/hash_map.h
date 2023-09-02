@@ -8,7 +8,7 @@
 #include <memory>
 
 namespace custom {
-    template<typename KeyType, typename DataType, int depth = 16>
+    template<typename KeyType, typename DataType, int Depth = 16>
     class hash_map {
     public:
         struct pair {
@@ -18,16 +18,17 @@ namespace custom {
             pair(KeyType f, DataType s) : first(f), second(s) {}
         };
 
-        void insert(KeyType first, DataType second);
+        void insert(const KeyType& first, const DataType& second);
 
-        bool exist(KeyType &first);
+        bool exist(const KeyType &first);
 
         bool find(KeyType &first, DataType &return_destination);
 
 
         DataType &operator[](KeyType &&first);
+        DataType &operator[](const KeyType &first);
 
-        hash_map &operator=(const hash_map<KeyType, DataType, depth>& other);
+        hash_map &operator=(const hash_map<KeyType, DataType, Depth>& other);
 
     public:
         hash_map();
@@ -46,7 +47,7 @@ namespace custom {
             Node() : key(0), next(nullptr) {}
         };
 
-        Node *m_bucket[depth];
+        Node *m_bucket[Depth];
         std::hash<KeyType> m_Hasher;
 
         void m_Clear();
@@ -54,7 +55,7 @@ namespace custom {
         void m_Init();
 
         // Inserts the value without caring about whether it exists or not.
-        void m_force_insert(KeyType first, DataType second);
+        void m_force_insert(const KeyType &first, const DataType &second);
 
 
         // This will hold the last accessed element to fast find.
@@ -74,7 +75,7 @@ custom::hash_map<KeyType, DataType, depth> &custom::hash_map<KeyType, DataType, 
                 node = node->next;
             }
         }
-        return *this;
+
     }
 
     return *this;
@@ -93,6 +94,18 @@ DataType &custom::hash_map<KeyType, DataType, depth>::operator[](KeyType &&first
     }
 }
 
+template<typename KeyType, typename DataType, int depth>
+DataType &custom::hash_map<KeyType, DataType, depth>::operator[](const KeyType &first) {
+    if (hold->values.first == first) return hold->values.second;
+
+    if (exist(first))
+        return hold->values.second;
+    else {
+        m_force_insert(first, DataType());
+        return hold->values.second;
+    }
+}
+
 
 template<typename KeyType, typename DataType, int depth>
 custom::hash_map<KeyType, DataType, depth>::hash_map() {
@@ -101,21 +114,21 @@ custom::hash_map<KeyType, DataType, depth>::hash_map() {
 
 
 template<typename KeyType, typename DataType, int depth>
-void custom::hash_map<KeyType, DataType, depth>::insert(KeyType first, DataType second) {
+void custom::hash_map<KeyType, DataType, depth>::insert(const KeyType& first, const DataType& second) {
     // Use std::move to properly pass lvalue and rvalue arguments.
     size_t key = m_Hasher(first);
     int bucket_index = key % depth;
 
     if (!m_bucket[bucket_index]) {
-        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second));
+        m_bucket[bucket_index] = new Node(key, first, second);
     } else {
         if (exist(first)) {
-            hold->values.second = std::move(second);
+            hold->values.second = second;
             return;
         }
 
         Node *holder = m_bucket[bucket_index];
-        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second), holder);
+        m_bucket[bucket_index] = new Node(key, first, second, holder);
     }
 
     hold = m_bucket[bucket_index];
@@ -123,16 +136,16 @@ void custom::hash_map<KeyType, DataType, depth>::insert(KeyType first, DataType 
 
 
 template<typename KeyType, typename DataType, int depth>
-void custom::hash_map<KeyType, DataType, depth>::m_force_insert(KeyType first, DataType second) {
+void custom::hash_map<KeyType, DataType, depth>::m_force_insert(const KeyType& first, const DataType& second) {
     // Use std::move to properly pass lvalue and rvalue arguments.
     size_t key = m_Hasher(first);
     int bucket_index = key % depth;
 
     if (!m_bucket[bucket_index]) {
-        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second));
+        m_bucket[bucket_index] = new Node(key, first, second);
     } else {
         Node *holder = m_bucket[bucket_index];
-        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second), holder);
+        m_bucket[bucket_index] = new Node(key, first, second, holder);
     }
 
     hold = m_bucket[bucket_index];
@@ -156,7 +169,7 @@ bool custom::hash_map<KeyType, DataType, depth>::find(KeyType &first, DataType &
 
 
 template<typename KeyType, typename DataType, int depth>
-bool custom::hash_map<KeyType, DataType, depth>::exist(KeyType &first) {
+bool custom::hash_map<KeyType, DataType, depth>::exist(const KeyType &first) {
     size_t key = m_Hasher(first);
     int bucket_index = key % depth;
 
