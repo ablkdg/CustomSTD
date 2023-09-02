@@ -5,7 +5,6 @@
 #ifndef CUSTOM_HASHMAP_H
 #define CUSTOM_HASHMAP_H
 
-#include <cstdint>
 #include <memory>
 
 namespace custom {
@@ -38,11 +37,11 @@ namespace custom {
 
     private:
         struct Node {
-            uint32_t key;
+            size_t key;
             pair values;
             Node *next;
 
-            Node(uint32_t k, KeyType f, DataType s, Node *n = nullptr) : key(k), values(f, s), next(n) {}
+            Node(size_t k, KeyType f, DataType s, Node *n = nullptr) : key(k), values(f, s), next(n) {}
 
             Node() : key(0), next(nullptr) {}
         };
@@ -75,6 +74,7 @@ custom::hash_map<KeyType, DataType, depth> &custom::hash_map<KeyType, DataType, 
                 node = node->next;
             }
         }
+        return *this;
     }
 
     return *this;
@@ -103,44 +103,44 @@ custom::hash_map<KeyType, DataType, depth>::hash_map() {
 template<typename KeyType, typename DataType, int depth>
 void custom::hash_map<KeyType, DataType, depth>::insert(KeyType first, DataType second) {
     // Use std::move to properly pass lvalue and rvalue arguments.
-    uint32_t key = m_Hasher(first);
-    int bucketIndex = key % depth;
+    size_t key = m_Hasher(first);
+    int bucket_index = key % depth;
 
-    if (!m_bucket[bucketIndex]) {
-        m_bucket[bucketIndex] = new Node(key, std::move(first), std::move(second));
+    if (!m_bucket[bucket_index]) {
+        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second));
     } else {
         if (exist(first)) {
             hold->values.second = std::move(second);
             return;
         }
 
-        Node *holder = m_bucket[bucketIndex];
-        m_bucket[bucketIndex] = new Node(key, std::move(first), std::move(second), holder);
+        Node *holder = m_bucket[bucket_index];
+        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second), holder);
     }
 
-    hold = m_bucket[bucketIndex];
+    hold = m_bucket[bucket_index];
 }
 
 
 template<typename KeyType, typename DataType, int depth>
 void custom::hash_map<KeyType, DataType, depth>::m_force_insert(KeyType first, DataType second) {
     // Use std::move to properly pass lvalue and rvalue arguments.
-    uint32_t key = m_Hasher(first);
-    int bucketIndex = key % depth;
+    size_t key = m_Hasher(first);
+    int bucket_index = key % depth;
 
-    if (!m_bucket[bucketIndex]) {
-        m_bucket[bucketIndex] = new Node(key, std::move(first), std::move(second));
+    if (!m_bucket[bucket_index]) {
+        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second));
     } else {
-        Node *holder = m_bucket[bucketIndex];
-        m_bucket[bucketIndex] = new Node(key, std::move(first), std::move(second), holder);
+        Node *holder = m_bucket[bucket_index];
+        m_bucket[bucket_index] = new Node(key, std::move(first), std::move(second), holder);
     }
 
-    hold = m_bucket[bucketIndex];
+    hold = m_bucket[bucket_index];
 }
 
 
 template<typename KeyType, typename DataType, int depth>
-custom::hash_map<KeyType, DataType, depth>::~hash_map() {
+custom::hash_map<KeyType, DataType, depth>::hash_map::~hash_map() {
     m_Clear();
 }
 
@@ -157,11 +157,11 @@ bool custom::hash_map<KeyType, DataType, depth>::find(KeyType &first, DataType &
 
 template<typename KeyType, typename DataType, int depth>
 bool custom::hash_map<KeyType, DataType, depth>::exist(KeyType &first) {
-    uint32_t key = m_Hasher(first);
-    int bucketIndex = key % depth;
+    size_t key = m_Hasher(first);
+    int bucket_index = key % depth;
 
-    if (!m_bucket[bucketIndex]) return false;
-    Node *currentNode = m_bucket[bucketIndex];
+    if (!m_bucket[bucket_index]) return false;
+    Node *currentNode = m_bucket[bucket_index];
 
     while (currentNode) {
         // Okay, assume that hashes are the same but is the real value also the same? We need to check that to be sure about this is not a conflict.
